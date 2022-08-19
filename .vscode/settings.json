@@ -1,4 +1,6 @@
 {
-    "editor.fontSize": 38,
-    "terminal.integrated.fontSize": 60
+    "editor.fontSize": 14,
+    "terminal.integrated.allowChords": true,
+    "editor.fontFamily": "'Liberation Mono', 'Courier New', monospace",
+    "css.lint.boxModel": "warning"
 }
