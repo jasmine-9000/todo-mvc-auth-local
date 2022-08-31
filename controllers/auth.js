@@ -12,6 +12,8 @@ const User = require('../models/User')
   }
   
   exports.postLogin = (req, res, next) => {
+
+    // validation
     const validationErrors = []
     if (!validator.isEmail(req.body.email)) validationErrors.push({ msg: 'Please enter a valid email address.' })
     if (validator.isEmpty(req.body.password)) validationErrors.push({ msg: 'Password cannot be blank.' })
@@ -21,7 +23,9 @@ const User = require('../models/User')
       return res.redirect('/login')
     }
     req.body.email = validator.normalizeEmail(req.body.email, { gmail_remove_dots: false })
-  
+    
+    // authentication
+    // if passport can log you in, then redirect with a flashed message.
     passport.authenticate('local', (err, user, info) => {
       if (err) { return next(err) }
       if (!user) {
@@ -55,11 +59,13 @@ const User = require('../models/User')
   }
   
   exports.postSignup = (req, res, next) => {
+    // validation
     const validationErrors = []
     if (!validator.isEmail(req.body.email)) validationErrors.push({ msg: 'Please enter a valid email address.' })
     if (!validator.isLength(req.body.password, { min: 8 })) validationErrors.push({ msg: 'Password must be at least 8 characters long' })
     if (req.body.password !== req.body.confirmPassword) validationErrors.push({ msg: 'Passwords do not match' })
   
+    // if there are errors, flash them then redirect to signup page.
     if (validationErrors.length) {
       req.flash('errors', validationErrors)
       return res.redirect('../signup')
@@ -72,6 +78,8 @@ const User = require('../models/User')
       password: req.body.password
     })
   
+    // MongoDB method
+    // if it finds username and email, throw error.
     User.findOne({$or: [
       {email: req.body.email},
       {userName: req.body.userName}
@@ -81,6 +89,7 @@ const User = require('../models/User')
         req.flash('errors', { msg: 'Account with that email address or username already exists.' })
         return res.redirect('../signup')
       }
+      // if it doesn't find it, save it to database.
       user.save((err) => {
         if (err) { return next(err) }
         req.logIn(user, (err) => {
